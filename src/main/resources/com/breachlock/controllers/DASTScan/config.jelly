@@ -1,0 +1,24 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" 
+         xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form" 
+         xmlns:c="/lib/credentials">
+    
+    <div>${%serverDescr}</div>
+    
+    <f:entry title="${%Email}" field="email">
+        <f:textbox palceholder="john.doe@example.com" />
+    </f:entry>
+    
+    <f:entry title="${%ApiKey}" field="apikey">
+        <f:password placeholder="15888528911383507b1bd68d62615014b07ff142c753a7" />
+    </f:entry>
+    
+    <f:entry title="Asset" field="asset">
+        <f:select default="" />
+    </f:entry>
+    
+    <f:validateButton
+        title="Register to Breachlock" progress="%Testing..."
+        method="testConnection" with="apikey,asset,email" />
+</j:jelly>
