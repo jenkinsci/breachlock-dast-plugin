@@ -6,7 +6,9 @@ import com.breachlock.models.AssetModel;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.Util;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
@@ -18,16 +20,18 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.DataBoundConstructor;
-
+import jenkins.model.Jenkins;
 import java.util.ArrayList;
 import java.util.Iterator;
 import okhttp3.FormBody;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.apache.commons.validator.EmailValidator;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.verb.POST;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * @author mitchel.k@breachlock.com
@@ -199,64 +203,84 @@ public class DASTScan extends Builder implements SimpleBuildStep {
          * Check the email field.
          * 
          * @param email Email used for app.breachlock.com
+         * @param item
          * 
          * @return FormValidation
          * 
          * @throws IOException
          * @throws ServletException 
          */
-        public FormValidation doCheckEmail(@QueryParameter String email)
+        public FormValidation doCheckEmail(
+                @QueryParameter String email,
+                @AncestorInPath Item item)
                 throws IOException, ServletException {
             
-            if (email.length() == 0)
+            // Check permissions
+            item.checkPermission(Item.CONFIGURE);
+            
+            // Check form fields
+            if (Util.fixEmptyAndTrim(email) == null)
                 return FormValidation.error(Messages.DASTScan_DescriptorImpl_errors_missingEmail());
-            
-            if (email.length() > 0 && EmailValidator.getInstance().isValid(email) == false)
+            else if (Util.fixEmptyAndTrim(email) != null && EmailValidator.getInstance().isValid(email) == false)
                 return FormValidation.error(Messages.DASTScan_DescriptorImpl_warnings_invalidEmail());
-            
-            return FormValidation.ok();
+            else
+                return FormValidation.ok();
         }
         
         /**
          * Check the asset field.
          * 
          * @param asset Asset to scan
+         * @param item
          * 
          * @return FormValidation
          * 
          * @throws IOException
          * @throws ServletException 
          */
-        public FormValidation doCheckAsset(@QueryParameter String asset)
+        @POST
+        public FormValidation doCheckAsset(
+                @QueryParameter String asset,
+                @AncestorInPath Item item)
                 throws IOException, ServletException {
+                        
+            // Check permissions           
+            item.checkPermission(Item.CONFIGURE);
             
-            if (asset.length() == 0)
+            // Check form fields
+            if (Util.fixEmptyAndTrim(asset) == null)
                 return FormValidation.error(Messages.DASTScan_DescriptorImpl_errors_missingAsset());
-            
-            return FormValidation.ok();
+            else
+                return FormValidation.ok();
         }
         
         /**
          * Check the API key field.
          * 
          * @param apikey Jenkins integration API key
+         * @param item
          * 
          * @return FormValidation
          * 
          * @throws IOException
          * @throws ServletException 
          */
+        @SuppressWarnings("unused")
         public FormValidation doCheckApikey(
-                @QueryParameter String apikey)
+                @QueryParameter String apikey,
+                @AncestorInPath Item item)
                 throws IOException, ServletException {
             
-            if (apikey.length() == 0)
+            // Check permissions
+            item.checkPermission(Item.CONFIGURE);
+            
+            // Check form fields
+            if (Util.fixEmptyAndTrim(apikey) == null)
                 return FormValidation.error(Messages.DASTScan_DescriptorImpl_errors_missingAPIKey());
-            
-            if (apikey.length() < 32 )
+            else if (apikey.length() < 32 )
                 return FormValidation.warning(Messages.DASTScan_DescriptorImpl_warnings_tooShort());
-            
-            return FormValidation.ok();
+            else
+                return FormValidation.ok();
         }
         
         /**
@@ -272,11 +296,15 @@ public class DASTScan extends Builder implements SimpleBuildStep {
          * @throws ServletException 
          */
         @SuppressWarnings("unused")
+        @POST
         public FormValidation doTestConnection(
                 @QueryParameter String apikey,
                 @QueryParameter String asset,
                 @QueryParameter String email)
                 throws IOException, ServletException {
+            
+            // Check permissions
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
             
             // Register Plugin
             ApiHelper apiHelper = new ApiHelper();
@@ -305,9 +333,14 @@ public class DASTScan extends Builder implements SimpleBuildStep {
          * @return ListBoxModel Selectbox with assets
          */
         @SuppressWarnings("unused")
+        @POST
         public ListBoxModel doFillAssetItems(
                 @QueryParameter String apikey,
-                @QueryParameter String email) {           
+                @QueryParameter String email) {  
+            
+            // https://wiki.jenkins.io/display/JENKINS/Matrix-based+security
+            Jenkins.get().checkPermission(Jenkins.ADMINISTER);
+            
             // Fetch assets
             ApiHelper apiHelper = new ApiHelper();
             apiHelper.setEndpoint("/servers/getAssetsForJenkins");
@@ -341,8 +374,8 @@ public class DASTScan extends Builder implements SimpleBuildStep {
             final ArrayList<AssetModel.Asset> assets = assetModel.getAssets();
             model.add("Please select an asset", "");
             
-            for (AssetModel.Asset item : assets)
-                model.add(item.getUrl(), item.getHostId());
+            for (AssetModel.Asset a : assets)
+                model.add(a.getUrl(), a.getHostId());
 
             return model;
         }

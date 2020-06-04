@@ -7,18 +7,19 @@
     <div>${%serverDescr}</div>
     
     <f:entry title="${%Email}" field="email">
-        <f:textbox palceholder="john.doe@example.com" />
+        <f:textbox palceholder="john.doe@example.com" checkMethod="post" />
     </f:entry>
     
     <f:entry title="${%ApiKey}" field="apikey">
-        <f:password placeholder="15888528911383507b1bd68d62615014b07ff142c753a7" />
+        <f:password placeholder="15888528911383507b1bd68d62615014b07ff142c753a7" checkMethod="post" />
     </f:entry>
     
     <f:entry title="Asset" field="asset">
-        <f:select default="" />
+        <f:select default="" checkMethod="post" />
     </f:entry>
     
     <f:validateButton
         title="Register to Breachlock" progress="%Testing..."
-        method="testConnection" with="apikey,asset,email" />
+        method="testConnection" with="apikey,asset,email" 
+        checkMethod="post" />
 </j:jelly>
