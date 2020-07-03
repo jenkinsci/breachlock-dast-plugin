@@ -18,7 +18,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>breachlock-dast</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
