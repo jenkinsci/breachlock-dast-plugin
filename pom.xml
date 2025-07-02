@@ -2,32 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <name>Breachlock DAST Plugin</name>
     <description>Start DAST scans through the Breachlock platform.</description>
-    <developers>
-        <developer>
-            <id>mitchel.k</id>
-            <name>Mitchel Koster</name>
-            <email>mitchel.k@breachlock.com</email>
-        </developer>
-    </developers>
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.2</version>
+        <version>5.18</version>
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>breachlock-dast</artifactId>
     <version>1.3-SNAPSHOT</version>
     <packaging>hpi</packaging>
-    <properties>
+    <properties> 
+        <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ --> 
+        <jenkins.baseline>2.492</jenkins.baseline>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
         <!-- Version 2.164.3 is Jenkins LTS --> 
-        <jenkins.version>2.164.3</jenkins.version>
-        <java.level>8</java.level>
-        <!-- Maven compiler used -->
-        <maven.compiler.source>3.6.0</maven.compiler.source>
-        <maven.compiler.target>3.6.0</maven.compiler.target>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     </properties>
     <licenses>
         <license>
@@ -40,8 +31,8 @@
             <dependency>
                 <!-- Pick up common dependencies for 2.164.x: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.164.x</artifactId>
-                <version>3</version>
+                <artifactId>bom-${jenkins.baseline}.x</artifactId>
+                <version>4969.v6ffa_18d90c9f</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>
@@ -99,7 +90,7 @@
     <!-- Assuming you want to host on @jenkinsci: -->
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <scm>
-        <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+        <connection>scm:git:https://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
       <tag>HEAD</tag>
@@ -120,7 +111,6 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>4.6.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -137,13 +127,11 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-collections/commons-collections -->
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/commons-digester/commons-digester -->
         <dependency>
@@ -155,7 +143,6 @@
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <version>1.2</version>
         </dependency>
     </dependencies>
 </project>
